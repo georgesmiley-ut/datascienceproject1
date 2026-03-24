@@ -1,6 +1,12 @@
 # First Project for a Data Science Class
 
-This repository contains a data science project that analyzes historical node/edge data, derives graph-based power broker scores, and assigns modern-day wealth classifications to sites. A machine learning model is used to assess the association of this archaelogical data with modern day wealth classifications of the locations
+This repository contains a data science project that analyzes historical node/edge data, derives graph-based power broker scores, and assigns modern-day wealth classifications to sites. A machine learning model is used to assess the association of this archaelogical data with modern day wealth classifications of the locations.
+
+
+## Sources
+
+Data was obtained from "Project Mercury" https://projectmercury.eu/datasets/
+
 
 ## File Index (Detailed Purpose + Links)
 
