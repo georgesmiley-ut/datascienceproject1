@@ -7,6 +7,19 @@ import igraph as ig
 
 
 def build_graph(nodes_df: pd.DataFrame, edges_df: pd.DataFrame) -> ig.Graph:
+    """Create a directed igraph graph from node and edge tables.
+
+    Purpose:
+        Build a graph with vertex names aligned to the `id` order in `nodes_df`
+        so computed centrality values can be written back to the same rows.
+
+    Args:
+        nodes_df: DataFrame containing at least an `id` column.
+        edges_df: DataFrame containing `source` and `target` columns.
+
+    Returns:
+        A directed igraph.Graph containing all nodes and edges from the inputs.
+    """
     g = ig.Graph(directed=True)
     # Preserve node ordering from nodes_df so scores align back to rows
     g.add_vertices(nodes_df["id"].tolist())
@@ -15,10 +28,35 @@ def build_graph(nodes_df: pd.DataFrame, edges_df: pd.DataFrame) -> ig.Graph:
 
 
 def directed_closeness(g: ig.Graph, mode: str = "out") -> list[float]:
+    """Compute directed closeness centrality values for all vertices.
+
+    Purpose:
+        Calculate normalized closeness scores using igraph's directed mode
+        options to quantify each site's network accessibility.
+
+    Args:
+        g: Directed graph whose vertex scores should be computed.
+        mode: Closeness direction mode; one of `out`, `in`, or `all`.
+
+    Returns:
+        A list of closeness centrality values in graph vertex order.
+    """
     return g.closeness(mode=mode, normalized=True)
 
 
 def main() -> None:
+    """Run the CLI pipeline for power broker score generation.
+
+    Purpose:
+        Load ORBIS node/edge data, compute directed closeness with all edges and
+        with road edges removed, then write the enriched node table to CSV.
+
+    Args:
+        None.
+
+    Returns:
+        None. Writes an output CSV as a side effect.
+    """
     parser = argparse.ArgumentParser(
         description="Build igraph graphs and compute directed closeness centrality."
     )

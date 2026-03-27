@@ -16,6 +16,18 @@ API_URL = "https://api.openai.com/v1/responses"
 
 
 def load_env(env_path: Path) -> None:
+    """Load key-value pairs from a `.env` file into process environment vars.
+
+    Purpose:
+        Provide local configuration loading for API credentials when running
+        from the command line.
+
+    Args:
+        env_path: Path to the `.env` file.
+
+    Returns:
+        None. Updates `os.environ` in place for keys not already set.
+    """
     if not env_path.exists():
         return
     for line in env_path.read_text(encoding="utf-8").splitlines():
@@ -27,6 +39,19 @@ def load_env(env_path: Path) -> None:
 
 
 def extract_output_text(response_json: dict) -> str:
+    """Extract model text output from a Responses API JSON payload.
+
+    Purpose:
+        Normalize both `output_text` convenience responses and structured
+        `output` message blocks into a single text string.
+
+    Args:
+        response_json: Parsed JSON object returned by the API.
+
+    Returns:
+        The stripped output text content. Returns an empty string if no text
+        content exists.
+    """
     if "output_text" in response_json:
         return str(response_json["output_text"]).strip()
     output = response_json.get("output", [])
@@ -41,6 +66,26 @@ def extract_output_text(response_json: dict) -> str:
 
 
 def call_openai(api_key: str, model: str, prompt: str, max_retries: int = 5) -> str:
+    """Call the OpenAI Responses API and return the classifier label text.
+
+    Purpose:
+        Send a strict classification prompt, retrying transient API/network
+        failures with exponential backoff.
+
+    Args:
+        api_key: OpenAI API key used for authorization.
+        model: Model name to invoke for classification.
+        prompt: Record-specific user input text to classify.
+        max_retries: Maximum number of retry attempts for transient failures.
+
+    Returns:
+        Model output text containing the predicted class label.
+
+    Raises:
+        urllib.error.HTTPError: If a non-retriable HTTP error occurs.
+        urllib.error.URLError: If network errors persist after retries.
+        RuntimeError: If all retry attempts are exhausted.
+    """
     payload = {
         "model": model,
         "instructions": (
@@ -90,6 +135,17 @@ def call_openai(api_key: str, model: str, prompt: str, max_retries: int = 5) -> 
 
 
 def build_prompt(row: dict) -> str:
+    """Build a deterministic classification prompt from one CSV record.
+
+    Purpose:
+        Serialize row attributes and ask for a single wealth class label.
+
+    Args:
+        row: Dictionary representation of one input CSV row.
+
+    Returns:
+        Prompt text to send to the model.
+    """
     record = {k: row.get(k) for k in row.keys()}
     return (
         "Classify the following record into one of: Wealthy, Medium Wealthy, Poor, "
@@ -100,6 +156,18 @@ def build_prompt(row: dict) -> str:
 
 
 def main() -> None:
+    """Run the CLI workflow for classifying sites by modern wealth class.
+
+    Purpose:
+        Load configuration, iterate records in an input CSV, classify each row
+        via OpenAI, and write the resulting labels to an output CSV file.
+
+    Args:
+        None.
+
+    Returns:
+        None. Writes an output CSV as a side effect.
+    """
     parser = argparse.ArgumentParser(
         description="Classify sites into Wealthy/Medium Wealthy/Poor using OpenAI."
     )
