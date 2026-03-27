@@ -2,11 +2,26 @@
 
 This repository contains a data science project that analyzes historical node/edge data, derives graph-based power broker scores, and assigns modern-day wealth classifications to sites. A machine learning model is used to assess the association of this archaelogical data with modern day wealth classifications of the locations.
 
+## Project Motivation
+
+I wanted to test whether long-run infrastructure history can be linked to modern outcomes. Roman transportation networks are one of the best preserved pre-modern systems, and Project Mercury provides structured archaeological data that allows quantitative analysis. By combining network structure (closeness centrality), transportation costs, and modern wealth labels, this project explores whether ancient connectivity patterns still have measurable associations with present-day regional prosperity.
 
 ## Sources
 
 Data was obtained from "Project Mercury" https://projectmercury.eu/datasets/
 
+## Libraries Used
+
+- `pandas`
+- `numpy`
+- `scipy`
+- `matplotlib`
+- `seaborn`
+- `scikit-learn`
+- `igraph`
+- `tqdm`
+- `openai` API (called via HTTP in `classify_sites_wealth.py`)
+- Jupyter Notebook (`analysis.ipynb`, `model.ipynb`)
 
 ## File Index (Detailed Purpose + Links)
 
@@ -23,15 +38,13 @@ Data was obtained from "Project Mercury" https://projectmercury.eu/datasets/
 - [`sites_extended_with_wealth_class.csv`](sites_extended_with_wealth_class.csv): `sites_extended.csv` plus a `wealth_class` column produced by `classify_sites_wealth.py`.
 - [`final_data_set.csv`](final_data_set.csv): Final merged dataset that combines node scores with `wealth_class` on `id`.
 
+## Results Summary
 
-## Suggested Notebook Structure (CRISP-DM)
+- Transportation type and expense show a measurable association in the exploratory analysis (road transport appears higher cost on average in the dataset).
+- The feature engineering pipeline creates power-broker variables (`closeness_all_edges`, `closeness_no_road_edges`) that capture structural role in the Roman network.
+- The classification model in `model.ipynb` achieves about `0.75` accuracy on the held-out split used in the notebook.
+- Model interpretation (SHAP and feature importance outputs) indicates location variables (`x`, `y`) are strong predictors, suggesting geography is a significant factor alongside network structure.
 
-1. **Business Understanding:** State 3–5 questions and why they matter.
-2. **Data Understanding:** Describe data sources and key columns.
-3. **Data Preparation:** Cleaning steps, missing value handling, categorical encoding.
-4. **Modeling / Analysis:** Graph metrics, statistics, or ML models (if needed).
-5. **Evaluation:** Validate findings and discuss limitations.
-6. **Deployment / Reporting:** Summarize insights and outputs.
 
 ## Quick Usage
 
@@ -41,4 +54,4 @@ Data was obtained from "Project Mercury" https://projectmercury.eu/datasets/
    - Add `OPENAI_API_KEY` to `.env`
    - `python classify_sites_wealth.py`
 3. Merge outputs into `final_data_set.csv`:
-   - Use the provided merge snippet in your notebook or a small script.
+   - Use the provided merge snippet in a notebook or a small script.
